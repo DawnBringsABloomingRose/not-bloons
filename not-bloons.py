@@ -5,7 +5,7 @@ from pygame.locals import *
 from lib import bloon, Levels
 
 def update():
-    bloons.update()
+    levels.update(windowSurface)
 
 pygame.init()
 mainClock = pygame.time.Clock()
@@ -27,19 +27,15 @@ BLUE = (0, 0, 255)
 #level and game variables
 pathwaypoints = [(0 , WINDOWHEIGHT - 200), (100, WINDOWHEIGHT - 200), (100, 300), (400, 300), (400, 100), (500, 100), (500, WINDOWHEIGHT - 100), (WINDOWWIDTH, WINDOWHEIGHT - 100)]
 paths = Levels.Path(pathwaypoints)
-bloons = bloon.PurpleBloon(paths)
-levels = Levels.Level(paths)
-round = 0
-lives = 100
+
+rounds = []
+round1 = [[0, 30, [['red', 3], ['purple', 1]]], [3, 10,[['red', 2]]]]
+rounds.append(round1)
+levels = Levels.Level(pathwaypoints, rounds)
 money = 800
 paused = False
 
-text = basicFont.render('Lives:', True, WHITE, BLUE)
-textRect = text.get_rect()
-textRect.left = 20
-textRect.top = 20
 
-bloons.draw_bloon(windowSurface)
 #game loop
 while True:
     for event in pygame.event.get():
@@ -48,14 +44,6 @@ while True:
             sys.exit()
     
     windowSurface.fill(WHITE)
-    bloons.update()
-    text = basicFont.render(f'lives: {lives}', True, WHITE, BLUE)
-    if bloons.end:
-        lives -= bloons.layer
-        del bloons
-        bloons = bloon.PurpleBloon(paths)
-    paths.draw_path(windowSurface)
-    bloons.draw_bloon(windowSurface)
-    windowSurface.blit(text, textRect)
+    update()
     pygame.display.update()
     mainClock.tick(FPS)

@@ -1,6 +1,12 @@
 import pygame
 from . import bloon
 
+
+BLACK = (0,0,0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 class Path:
     def __init__(self, waypoints, thickness = 40):
         #waypoints is an array of 2d vectors representing the path, the first element being the start of the path and the last the end
@@ -14,11 +20,27 @@ class Path:
 
 
 class Level:
+    
     def __init__(self, path, rounds):
         self.path = Path(path)
         self.rounds = rounds
-        self.current_round = 0
-        self.round = Rounds(rounds[0])
+        self.current_round = 1
+        self.round = Rounds(rounds[0], self.path)
+        self.lives = 100
+    
+    def update(self, surface):
+        basicFont = pygame.font.SysFont(None, 48)
+        self.path.draw_path(surface)
+        lives_lost = self.round.update(surface)
+        self.lives -= lives_lost
+
+        text = basicFont.render('Lives:', True, WHITE, BLUE)
+        textRect = text.get_rect()
+        textRect.left = 20
+        textRect.top = 20
+        text = basicFont.render(f'lives: {self.lives}', True, WHITE, BLUE)
+        surface.blit(text, textRect)
+
 
 
 #a round array will consist of some amount of wave arrays
@@ -32,10 +54,47 @@ class Rounds:
         'red' : bloon.RedBloon,
         'purple' : bloon.PurpleBloon
     }
-    def __init__(self, arr):
+    def __init__(self, arr, path):
         self.num_of_waves = len(arr)
         self.wave_counter = 0
         self.bloon_counter = 0
-        self.current_wave = arr[0]
         self.waves = arr
-        
+        self.current_wave = self.waves.pop(0)
+        self.spawned_bloons = []
+        self.current_bloons = self.current_wave[2][0]
+        self.path = path
+        self.eor = False
+
+    def update(self, surface):
+        #update all bloons
+        #if new wave, start it
+        self.wave_counter += 1
+        self.bloon_counter += 1
+        #60 fps
+        if not self.eor:
+            if self.bloon_counter >= self.current_wave[1] and self.wave_counter >= self.current_wave[0] * 60:
+                new_bloon = self.BLOON_CLASSES[self.current_bloons[0]](self.path) #change eventually
+                self.spawned_bloons.append(new_bloon)
+                self.bloon_counter = 0
+                self.current_bloons[1] -= 1
+            
+            
+            if self.current_bloons[1] == 0:
+                if len(self.current_wave[2]) == 0:
+                    if len(self.waves) != 0:
+                        self.current_wave = self.waves.pop(0)
+                        self.wave_counter = 0
+                    else:
+                        self.eor = True
+                if not self.eor:
+                    self.current_bloons = self.current_wave[2].pop(0)
+
+        lives = 0
+        for i in self.spawned_bloons:
+            i.update()
+            i.draw_bloon(surface)
+            if i.end:
+                lives += i.layer
+        self.spawned_bloons = [x for x in self.spawned_bloons if not x.end]
+
+        return lives
