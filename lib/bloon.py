@@ -9,11 +9,34 @@ PURPLE = (140, 0, 255)
 YELLOW = (255, 255, 0)
 PINK  = (255, 105, 180)
 
-def classes():
+def classes(value):
+    bloon_values = {
+        1 : 'red',
+        2 : 'blue',
+        3 : 'green',
+        4 : 'yellow',
+        5 : 'pink',
+        11 : 'black'
+    }
+
     BLOON_CLASSES = {
         'red' : RedBloon,
+        'blue' : BlueBloon,
+        'green' : GreenBloon,
+        'yellow' : YellowBloon,
+        'pink' : PinkBloon,
+        'black' : BlackBloon,
         'purple' : PurpleBloon
     }
+    if type(value) is int:
+        try:
+            color = bloon_values[value]
+        except:
+            return False
+        
+        return BLOON_CLASSES[color]
+    else:
+        return BLOON_CLASSES[value]
 
 class Bloon:
     def __init__(self, color, dart_imm, magic_imm, bomb_imm, movement_speed, layers, path):
@@ -31,6 +54,7 @@ class Bloon:
         self.immune = []
         self.destroyed = False
         self.classes = classes
+        self.startinghealth = layers
 
     def draw_bloon(self, surface):
         pygame.draw.ellipse(surface, self.color, self.rect)
@@ -51,12 +75,45 @@ class Bloon:
             self.current_waypoint += 1
 
     def damage(self, dart):
-        if dart in self.immune:
+        if dart in self.immune or self.immune_to(dart.type):
             return
         self.immune.append(dart)
         self.layer -= dart.damage
-        if self.layer <= 0:
-            self.destroyed = True
+        self.destroyed = True
+    
+    def immune_to (self, dart):
+        if dart == 'dart':
+            return self.dart_imm
+        elif dart == 'bomb':
+            return self.bomb_imm
+        elif dart == 'magic':
+            return self.magic_imm
+        else:
+            return False
+        
+    def spawn_new(self):
+        to_add = []
+        value_to_add = self.layer
+        while self.layer > 0:
+            new_bloon = self.classes(value_to_add)
+            if new_bloon != False:
+                self.layer -= value_to_add
+                value_to_add = self.layer
+                to_add.append(new_bloon)
+            else:
+                value_to_add -= 1
+        bloons = []
+        updates = 0
+        for bloon in to_add:
+            bloon = bloon(self.path)
+            bloon.rect.center = self.rect.center
+            bloon.current_waypoint = self.current_waypoint
+            bloon.immune = self.immune
+            for update in range(updates):
+                bloon.update()
+            updates += 2
+            bloons.append(bloon)
+        return bloons
         
 
 

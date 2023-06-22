@@ -39,7 +39,7 @@ pathwaypoints = [(0 , WINDOWHEIGHT - 200), (100, WINDOWHEIGHT - 200), (100, 300)
 paths = Levels.Path(pathwaypoints)
 
 rounds = []
-round1 = [[0, 30, [['red', 3], ['purple', 1]]], [3, 10,[['red', 2]]]]
+round1 = [[0, 30, [['red', 3], ['black', 1]]], [3, 10,[['red', 2]]]]
 rounds.append(round1)
 levels = Levels.Level(pathwaypoints, rounds)
 money = 800

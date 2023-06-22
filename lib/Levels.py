@@ -74,7 +74,7 @@ class Rounds:
         #60 fps
         if not self.eor:
             if self.bloon_counter >= self.current_wave[1] and self.wave_counter >= self.current_wave[0] * 60:
-                new_bloon = self.BLOON_CLASSES[self.current_bloons[0]](self.path) #change eventually
+                new_bloon = bloon.classes(self.current_bloons[0])(self.path) #change eventually
                 self.spawned_bloons.append(new_bloon)
                 self.bloon_counter = 0
                 self.current_bloons[1] -= 1
@@ -91,11 +91,15 @@ class Rounds:
                     self.current_bloons = self.current_wave[2].pop(0)
 
         lives = 0
+        new_bloons = []
         for i in self.spawned_bloons:
             i.update()
             i.draw_bloon(surface)
+            if i.startinghealth != i.layer:
+                new_bloons.extend(i.spawn_new())
             if i.end:
                 lives += i.layer
+        self.spawned_bloons.extend(new_bloons)
         self.spawned_bloons = [x for x in self.spawned_bloons if not x.end and not x.destroyed]
 
         return lives
