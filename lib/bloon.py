@@ -6,6 +6,14 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 PURPLE = (140, 0, 255)
+YELLOW = (255, 255, 0)
+PINK  = (255, 105, 180)
+
+def classes():
+    BLOON_CLASSES = {
+        'red' : RedBloon,
+        'purple' : PurpleBloon
+    }
 
 class Bloon:
     def __init__(self, color, dart_imm, magic_imm, bomb_imm, movement_speed, layers, path):
@@ -22,6 +30,7 @@ class Bloon:
         self.end = False
         self.immune = []
         self.destroyed = False
+        self.classes = classes
 
     def draw_bloon(self, surface):
         pygame.draw.ellipse(surface, self.color, self.rect)
@@ -58,3 +67,23 @@ class PurpleBloon(Bloon):
 class RedBloon(Bloon):
     def __init__(self, path):
         Bloon.__init__(self, RED, False, False, False, 1, 1, path)
+
+class BlueBloon(Bloon):
+    def __init__(self, path):
+        Bloon.__init__(self, BLUE, False, False, False, 1.1, 2, path)
+
+class GreenBloon(Bloon):
+    def __init__(self, path):
+        Bloon.__init__(self, GREEN, False, False, False, 1.3, 3, path)
+
+class YellowBloon(Bloon):
+    def __init__(self, path):
+        Bloon.__init__(self, YELLOW, False, False, False, 1.5, 4, path)
+
+class PinkBloon(Bloon):
+    def __init__(self, path):
+        Bloon.__init__(self, PINK, False, False, False, 1.6, 5, path)
+
+class BlackBloon(Bloon):
+    def __init__(self, path):
+        Bloon.__init__(self, BLACK, False, False, True, 1.8, 11, path)
