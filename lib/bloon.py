@@ -58,6 +58,7 @@ class Bloon:
 
     def draw_bloon(self, surface):
         pygame.draw.ellipse(surface, self.color, self.rect)
+        pygame.draw.ellipse(surface, BLACK, self.rect, 1)
 
     def update(self):
         if self.current_waypoint == len(self.path.waypoints):
