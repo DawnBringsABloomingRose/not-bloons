@@ -46,6 +46,7 @@ class Level:
         textRect.left = 20
         textRect.top = 20
         text = basicFont.render(f'lives: {self.lives}', True, WHITE, BLUE)
+        self.round.draw(surface)
         surface.blit(text, textRect)
 
 

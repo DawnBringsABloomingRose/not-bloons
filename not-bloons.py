@@ -44,6 +44,7 @@ def updateGraphics():
         monkey.draw(playArea)
     windowSurface.blit(buyArea, buyAreaRect)
     windowSurface.blit(playArea, playAreaRect)
+    windowSurface.blit(playbutton[0], playbutton[1])
     pygame.display.update()
 
 
@@ -78,7 +79,11 @@ for button in images:
     image = pygame.image.load(button)
     buttons.append([image,buttonrect, Monkeys.DartMonkey])
 
-
+playbuttonimg = pygame.image.load('play.jpg')
+scaledpb = pygame.transform.scale_by(playbuttonimg, 0.05)
+playbutton = [scaledpb, pygame.Rect((PLAYAREAWIDTH-200, PLAYAREAHEIGHT+50), (100, 100))]
+cross_rect = playbutton[0].get_rect(center = playbutton[1].center)
+playbutton[1] = cross_rect
 
 #level and game variables
 pathwaypoints = [(0 , PLAYAREAHEIGHT - 200), (100, PLAYAREAHEIGHT - 200), (100, 300), (400, 300), (400, 100), (500, 100), (500, PLAYAREAHEIGHT - 100), (PLAYAREAWIDTH, PLAYAREAHEIGHT - 100)]
@@ -110,6 +115,8 @@ while True:
             for button in buttons:
                 if button[1].collidepoint(x-PLAYAREAWIDTH,y):
                     selected_monk = [button[0], button[2]]
+            if playbutton[1].collidepoint(x, y):
+                paused = not paused
     
     if not paused:
         update()

@@ -14,7 +14,7 @@ class Monkey:
         self.shots = []
         self.rotated_image_rect = self.rect
        
-    def update(self, surface):
+    def update(self):
         
         #code to make the rotated image rotate around a point rather than float around
         #why is this so complicated god damn
