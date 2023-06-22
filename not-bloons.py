@@ -5,9 +5,10 @@ from pygame.locals import *
 from lib import bloon, Levels, Monkeys
 
 def update():
-    levels.update(windowSurface)
+    levels.update(playArea)
     allbloons = levels.allbloons()
     bloonsrect = []
+    windowSurface.blit(playArea, playAreaRect)
     for i in allbloons:
         bloonsrect.append(i.rect)
     monke.in_range(bloonsrect)
@@ -21,21 +22,25 @@ pygame.init()
 mainClock = pygame.time.Clock()
 
 #'settings' variables
-WINDOWWIDTH = 800
-WINDOWHEIGHT = 800
+WINDOWWIDTH = 1200
+WINDOWHEIGHT = 1000
+PLAYAREAWIDTH = WINDOWWIDTH*0.75
+PLAYAREAHEIGHT = WINDOWHEIGHT*0.75
 FPS = 60
-basicFont = pygame.font.SysFont(None, 48)
-windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption('Not Bloons!')
 BLACK = (0,0,0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+basicFont = pygame.font.SysFont(None, 48)
+windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+pygame.display.set_caption('Not Bloons!')
+playArea = pygame.Surface((WINDOWWIDTH*0.75, WINDOWHEIGHT*0.75))
+playAreaRect = pygame.Rect(0, 0, WINDOWHEIGHT * 0.75, WINDOWWIDTH*0.75)
 
 
 #level and game variables
-pathwaypoints = [(0 , WINDOWHEIGHT - 200), (100, WINDOWHEIGHT - 200), (100, 300), (400, 300), (400, 100), (500, 100), (500, WINDOWHEIGHT - 100), (WINDOWWIDTH, WINDOWHEIGHT - 100)]
+pathwaypoints = [(0 , PLAYAREAHEIGHT - 200), (100, PLAYAREAHEIGHT - 200), (100, 300), (400, 300), (400, 100), (500, 100), (500, PLAYAREAHEIGHT - 100), (PLAYAREAWIDTH, PLAYAREAHEIGHT - 100)]
 paths = Levels.Path(pathwaypoints)
 
 rounds = []
@@ -56,8 +61,10 @@ while True:
             sys.exit()
     
     windowSurface.fill(WHITE)
+
+    playArea.fill(WHITE)
     if not paused:
-        monke.update(windowSurface)
+        monke.update(playArea)
         update()
     pygame.display.update()
     mainClock.tick(FPS)
