@@ -54,7 +54,10 @@ class Monkey:
             angle = angle/magnitude
             angle = np.arccos(angle)
             #self.rotatedimg = pygame.transform.rotate(self.image, np.degrees(angle))
-            self.angle = np.degrees(angle)
+            if x >= 0:
+                self.angle = np.degrees(angle)
+            else:
+                self.angle = 360 - np.degrees(angle)
 
 class DartMonkey(Monkey):
     def __init__(self, x, y):
