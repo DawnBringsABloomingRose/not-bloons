@@ -41,6 +41,9 @@ class Level:
         text = basicFont.render(f'lives: {self.lives}', True, WHITE, BLUE)
         surface.blit(text, textRect)
 
+    def allbloons(self):
+        return self.round.spawned_bloons
+
 
 
 #a round array will consist of some amount of wave arrays
