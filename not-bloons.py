@@ -5,7 +5,7 @@ from pygame.locals import *
 from lib import bloon, Levels, Monkeys
 
 def update():
-    levels.update(playArea)
+    levels.update()
     allbloons = levels.allbloons()
     bloonsrect = []
     for i in allbloons:
@@ -13,13 +13,10 @@ def update():
     alldarts = []
     for monkey in monkeys:
         monkey.in_range(bloonsrect)
-        monkey.update(playArea)
+        monkey.update()
         alldarts.extend(monkey.shots)
     
-    if len(selected_monk) > 0:
-        mousepos = pygame.mouse.get_pos()
-        mouserect = selected_monk[0].get_rect(center = mousepos)
-        playArea.blit(selected_monk[0], mouserect)
+    
 
     for dart in alldarts:
         for i in allbloons:
@@ -27,13 +24,27 @@ def update():
                 i.damage(dart)
                 dart.pierce -= 1
 
-    windowSurface.blit(playArea, playAreaRect)
-    windowSurface.blit(buyArea, buyAreaRect)
 
 def updateBuyArea():
     for button in buttons:
         cross_rect = button[0].get_rect(center = button[1].center)
         buyArea.blit(button[0],cross_rect)
+    if len(selected_monk) > 0:
+        mousepos = pygame.mouse.get_pos()
+        mouserect = selected_monk[0].get_rect(center = mousepos)
+        playArea.blit(selected_monk[0], mouserect)
+
+def updateGraphics():
+    buyArea.fill(BLACK)
+    windowSurface.fill(WHITE)
+    playArea.fill(WHITE)
+    levels.draw(playArea)
+    updateBuyArea()
+    for monkey in monkeys:
+        monkey.draw(playArea)
+    windowSurface.blit(buyArea, buyAreaRect)
+    windowSurface.blit(playArea, playAreaRect)
+    pygame.display.update()
 
 
 pygame.init()
@@ -78,7 +89,7 @@ round1 = [[0, 30, [['red', 3], ['black', 1]]], [3, 10,[['red', 2]]]]
 rounds.append(round1)
 levels = Levels.Level(pathwaypoints, rounds)
 money = 800
-paused = False
+paused = True
 monkeys = []
 monke = Monkeys.DartMonkey(550,200)
 selected_monk = []
@@ -95,15 +106,12 @@ while True:
             if len(selected_monk) > 0:
                 new_monk = selected_monk[1](x,y)
                 monkeys.append(new_monk)
+                selected_monk = []
             for button in buttons:
                 if button[1].collidepoint(x-PLAYAREAWIDTH,y):
                     selected_monk = [button[0], button[2]]
     
-    windowSurface.fill(WHITE)
-    playArea.fill(WHITE)
-    buyArea.fill(BLACK)
     if not paused:
-        updateBuyArea()
         update()
-    pygame.display.update()
+    updateGraphics()
     mainClock.tick(FPS)

@@ -12,6 +12,7 @@ class Monkey:
         self.ammo = ammo
         self.shot_cd = self.attackspeed
         self.shots = []
+        self.rotated_image_rect = self.rect
        
     def update(self, surface):
         
@@ -25,16 +26,21 @@ class Monkey:
         rotated_offset = offset_center_to_pivot.rotate(-self.angle)
         rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
         self.rotatedimg = pygame.transform.rotate(self.image, self.angle)
-        rotated_image_rect = self.rotatedimg.get_rect(center = rotated_image_center)
+        self.rotated_image_rect = self.rotatedimg.get_rect(center = rotated_image_center)
 
         self.shot_cd += 1
-        self.draw_range(surface)
-        surface.blit(self.rotatedimg, rotated_image_rect)
+        
         for shot in self.shots:
-            shot.update(surface)
+            shot.update()
         
         self.shots = [x for x in self.shots if not x.destroyed]
     
+    def draw(self, surface):
+        self.draw_range(surface)
+        surface.blit(self.rotatedimg, self.rotated_image_rect)
+        for shot in self.shots:
+            shot.draw(surface)
+
     def draw_range(self, surface):
         pygame.draw.circle(surface,(124, 123, 133, 0.1), self.rect.center, self.range, 5)
 
@@ -93,8 +99,7 @@ class Ammo:
         self.direction = [self.target.center[0] - self.rect.center[0], self.target.center[1] - self.rect.center[1]]
         self.destroyed = False
 
-    def update(self, surface):
-        surface.blit(self.transformedimg, self.rect)
+    def update(self):
         magnitude = math.sqrt(pow(self.direction[0],2) + pow(self.direction[1], 2))
         self.direction[0] = self.direction[0]/magnitude
         self.direction[1] = self.direction[1]/magnitude
@@ -103,6 +108,10 @@ class Ammo:
 
         if self.pierce <= 0:
             self.destroyed = True
+    
+    def draw(self, surface):
+        surface.blit(self.transformedimg, self.rect)
+
         
 
 class Dart(Ammo):

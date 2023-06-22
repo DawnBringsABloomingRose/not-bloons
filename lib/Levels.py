@@ -28,22 +28,25 @@ class Level:
         self.round = Rounds(rounds[0], self.path)
         self.lives = 100
     
-    def update(self, surface):
-        basicFont = pygame.font.SysFont(None, 48)
-        self.path.draw_path(surface)
-        lives_lost = self.round.update(surface)
+    def update(self):
+        
+        lives_lost = self.round.update()
         self.lives -= lives_lost
 
+        
+
+    def allbloons(self):
+        return self.round.spawned_bloons
+    
+    def draw(self,surface):
+        basicFont = pygame.font.SysFont(None, 48)
+        self.path.draw_path(surface)
         text = basicFont.render('Lives:', True, WHITE, BLUE)
         textRect = text.get_rect()
         textRect.left = 20
         textRect.top = 20
         text = basicFont.render(f'lives: {self.lives}', True, WHITE, BLUE)
         surface.blit(text, textRect)
-
-    def allbloons(self):
-        return self.round.spawned_bloons
-
 
 
 #a round array will consist of some amount of wave arrays
@@ -68,7 +71,7 @@ class Rounds:
         self.path = path
         self.eor = False
 
-    def update(self, surface):
+    def update(self):
         self.wave_counter += 1
         self.bloon_counter += 1
         #60 fps
@@ -94,7 +97,6 @@ class Rounds:
         new_bloons = []
         for i in self.spawned_bloons:
             i.update()
-            i.draw_bloon(surface)
             if i.startinghealth != i.layer:
                 new_bloons.extend(i.spawn_new())
             if i.end:
@@ -103,3 +105,6 @@ class Rounds:
         self.spawned_bloons = [x for x in self.spawned_bloons if not x.end and not x.destroyed]
 
         return lives
+    def draw(self, surface):
+        for i in self.spawned_bloons:
+            i.draw_bloon(surface)
