@@ -4,16 +4,18 @@ import numpy as np
 class Monkey:
     def __init__(self, range, attackspeed, image, rect, ammo):
         self.range = range
-        self.attackspeed = attackspeed
+        self.attackspeed = 60/attackspeed
         self.image = pygame.image.load(image)
         self.rect = rect
         self.rotatedimg = pygame.transform.rotate(self.image, 0)
         self.angle = 0
         self.ammo = ammo
+        self.shot_cd = self.attackspeed
+        self.shots = []
        
     def update(self, surface):
         
-        #code to make the roated image rotate around a point rather than float around
+        #code to make the rotated image rotate around a point rather than float around
         #why is this so complicated god damn
         pos = self.rect.center
         w, h = self.image.get_size()
@@ -25,9 +27,11 @@ class Monkey:
         self.rotatedimg = pygame.transform.rotate(self.image, self.angle)
         rotated_image_rect = self.rotatedimg.get_rect(center = rotated_image_center)
 
-
+        self.shot_cd += 1
         self.draw_range(surface)
         surface.blit(self.rotatedimg, rotated_image_rect)
+        for shot in self.shots:
+            shot.update(surface)
     
     def draw_range(self, surface):
         pygame.draw.circle(surface,(124, 123, 133, 0.1), self.rect.center, self.range, 5)
@@ -59,6 +63,15 @@ class Monkey:
             else:
                 self.angle = 360 - np.degrees(angle)
 
+            if self.shot_cd >= self.attackspeed:
+                self.shoot(collisions[0])
+
+    def shoot(self, target):
+        ammorect = pygame.Rect(self.rect.x, self.rect.y, 10, 20)
+        shot = self.ammo(ammorect, target, self.angle)
+        self.shots.append(shot)
+        self.shot_cd = 0
+
 class DartMonkey(Monkey):
     def __init__(self, x, y):
         super().__init__(100, 1, "monkey.png", pygame.Rect(x, y, 50, 50), Dart)
@@ -66,15 +79,27 @@ class DartMonkey(Monkey):
         
 
 class Ammo:
-    def __init__(self, damage, rect, image, velocity, damagetype, pierce, target):
+    def __init__(self, damage, rect, image, velocity, damagetype, pierce, target, angle):
         self.damage = damage
         self.rect = rect 
-        self.image = image
+        self.image = pygame.image.load(image)
+        self.transformedimg = pygame.transform.rotozoom(self.image, angle, 0.2)
         self.velocity = velocity
         self.type = damagetype
         self.pierce = pierce 
         self.target = target
+        self.direction = [self.target.center[0] - self.rect.center[0], self.target.center[1] - self.rect.center[1]]
+
+    def update(self, surface):
+        surface.blit(self.transformedimg, self.rect)
+
+        magnitude = math.sqrt(pow(self.direction[0],2) + pow(self.direction[1], 2))
+        self.direction[0] = self.direction[0]/magnitude
+        self.direction[1] = self.direction[1]/magnitude
+        self.rect.bottom += self.direction[1] * self.velocity
+        self.rect.left += self.direction[0] * self.velocity
+        
 
 class Dart(Ammo):
-    def __init__(self, rect, target):
-        super().__init__(1, rect, "dart.png", 10, "dart", 3, target)
+    def __init__(self, rect, target, angle):
+        super().__init__(1, rect, "dart.png", 10, "dart", 3, target, angle)

@@ -69,8 +69,6 @@ class Rounds:
         self.eor = False
 
     def update(self, surface):
-        #update all bloons
-        #if new wave, start it
         self.wave_counter += 1
         self.bloon_counter += 1
         #60 fps
@@ -98,6 +96,6 @@ class Rounds:
             i.draw_bloon(surface)
             if i.end:
                 lives += i.layer
-        self.spawned_bloons = [x for x in self.spawned_bloons if not x.end]
+        self.spawned_bloons = [x for x in self.spawned_bloons if not x.end and not x.destroyed]
 
         return lives

@@ -20,6 +20,8 @@ class Bloon:
         self.current_waypoint = 1
         self.rect = pygame.Rect(path.startpoint[0], path.startpoint[1], 30, 45)
         self.end = False
+        self.immune = []
+        self.destroyed = False
 
     def draw_bloon(self, surface):
         pygame.draw.ellipse(surface, self.color, self.rect)
@@ -38,6 +40,14 @@ class Bloon:
         self.rect.left += direction[0] * self.movespeed
         if magnitude <= self.movespeed + 2:
             self.current_waypoint += 1
+
+    def damage(self, dart):
+        if dart in self.immune:
+            return
+        self.immune.append(dart)
+        self.layer -= dart.damage
+        if self.layer <= 0:
+            self.destroyed = True
         
 
 

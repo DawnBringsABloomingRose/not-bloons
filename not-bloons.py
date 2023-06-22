@@ -11,6 +11,11 @@ def update():
     for i in allbloons:
         bloonsrect.append(i.rect)
     monke.in_range(bloonsrect)
+    for dart in monke.shots:
+        for i in allbloons:
+            if i.rect.colliderect(dart.rect):
+                i.damage(dart)
+                dart.pierce -= 1
 
 pygame.init()
 mainClock = pygame.time.Clock()
@@ -34,7 +39,7 @@ pathwaypoints = [(0 , WINDOWHEIGHT - 200), (100, WINDOWHEIGHT - 200), (100, 300)
 paths = Levels.Path(pathwaypoints)
 
 rounds = []
-round1 = [[0, 300, [['red', 3], ['purple', 1]]], [3, 10,[['red', 2]]]]
+round1 = [[0, 30, [['red', 3], ['purple', 1]]], [3, 10,[['red', 2]]]]
 rounds.append(round1)
 levels = Levels.Level(pathwaypoints, rounds)
 money = 800
