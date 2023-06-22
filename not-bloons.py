@@ -10,8 +10,18 @@ def update():
     bloonsrect = []
     for i in allbloons:
         bloonsrect.append(i.rect)
-    monke.in_range(bloonsrect)
-    for dart in monke.shots:
+    alldarts = []
+    for monkey in monkeys:
+        monkey.in_range(bloonsrect)
+        monkey.update(playArea)
+        alldarts.extend(monkey.shots)
+    
+    if len(selected_monk) > 0:
+        mousepos = pygame.mouse.get_pos()
+        mouserect = selected_monk[0].get_rect(center = mousepos)
+        playArea.blit(selected_monk[0], mouserect)
+
+    for dart in alldarts:
         for i in allbloons:
             if i.rect.colliderect(dart.rect):
                 i.damage(dart)
@@ -55,7 +65,6 @@ buttons = []
 for button in images:
     buttonrect = pygame.Rect((0, (BUYAREAWIDTH/2)*loops), rectsize)
     image = pygame.image.load(button)
-    print(image.get_rect().center, buttonrect.center)
     buttons.append([image,buttonrect, Monkeys.DartMonkey])
 
 
@@ -82,13 +91,12 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == MOUSEBUTTONDOWN:
-            print(event.pos)
             x, y = event.pos
             if len(selected_monk) > 0:
-                selected_monk[1](x,y)
+                new_monk = selected_monk[1](x,y)
+                monkeys.append(new_monk)
             for button in buttons:
-                if button[1].collidepoint(x,y):
-                    print('test')
+                if button[1].collidepoint(x-PLAYAREAWIDTH,y):
                     selected_monk = [button[0], button[2]]
     
     windowSurface.fill(WHITE)
@@ -96,7 +104,6 @@ while True:
     buyArea.fill(BLACK)
     if not paused:
         updateBuyArea()
-        monke.update(playArea)
         update()
     pygame.display.update()
     mainClock.tick(FPS)
